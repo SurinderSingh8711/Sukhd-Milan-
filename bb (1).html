@@ -1,0 +1,1224 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>अपना रिश्ता - मैचिंग ऐप</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+        }
+
+        #sms-banner {
+            display: none;
+            position: fixed;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 400px;
+            background: #2e7d32;
+            color: #ffffff;
+            padding: 15px 20px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            z-index: 9999;
+            font-weight: bold;
+            font-size: 15px;
+            text-align: center;
+        }
+
+        .container {
+            background: #ffffff;
+            width: 100%;
+            max-width: 450px;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            position: relative;
+        }
+
+        .form-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #f1f1f1;
+            padding-bottom: 10px;
+        }
+        .back-btn {
+            background: #f0f0f0;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #d81b60;
+            font-size: 14px;
+        }
+        .progress-badge {
+            background: #d81b60;
+            color: white;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #d81b60;
+            margin-bottom: 20px;
+            font-size: 22px;
+        }
+        .step-page {
+            display: none;
+        }
+        .step-page.active {
+            display: block;
+        }
+        .form-group {
+            margin-bottom: 18px;
+        }
+        label {
+            display: block;
+            margin-bottom: 6px;
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            outline: none;
+        }
+        input:focus, select:focus {
+            border-color: #d81b60;
+        }
+        .phone-input {
+            background-color: #e8f5e9;
+            border-color: #81c784 !important;
+        }
+        .btn {
+            width: 100%;
+            background: #d81b60;
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .social-btn {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 15px;
+            border: 2px solid #ddd;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .google-btn {
+            color: #db4437;
+            border-color: #db4437;
+        }
+        .phone-login-btn {
+            color: #2e7d32;
+            border-color: #2e7d32;
+        }
+        .preview-img {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-top: 10px;
+            display: none;
+            border: 3px solid #d81b60;
+        }
+        .radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 5px;
+        }
+        .radio-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #f9f9f9;
+            padding: 12px;
+            border-radius: 8px;
+            border: 2px solid #eee;
+            cursor: pointer;
+            font-weight: normal;
+        }
+        .radio-label input {
+            width: auto;
+        }
+        .summary-box {
+            background: #fdf2f4;
+            border: 1px solid #f8bbd0;
+            padding: 15px;
+            border-radius: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            font-size: 14px;
+            color: #333;
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+        .biodata-title {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            color: #d81b60;
+            border-bottom: 2px dashed #f8bbd0;
+            padding-bottom: 6px;
+            margin-bottom: 10px;
+        }
+        .payment-box {
+            background: #e8f5e9;
+            border: 2px solid #2e7d32;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        .ai-speaking-indicator {
+            text-align: center;
+            color: #2e7d32;
+            font-size: 13px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .profile-card {
+            background: #ffffff;
+            border: 2px solid #f8bbd0;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            text-align: left;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #333;
+        }
+        .profile-card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 8px;
+            margin-bottom: 8px;
+        }
+        .profile-avatar {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            background: #d81b60;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 22px;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+        .mini-timer-box {
+            text-align: center;
+            font-size: 12px;
+            font-weight: bold;
+            color: #c62828;
+            background: #ffebee;
+            padding: 6px 10px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            display: inline-block;
+            border: 1px dashed #ef9a9a;
+        }
+        .hidden-badge {
+            background: #ffebee;
+            color: #c62828;
+            font-size: 12px;
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+            display: inline-block;
+        }
+        .reveal-btn {
+            background: #2e7d32;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            margin-top: 12px;
+            width: 100%;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div id="sms-banner">
+    📲 नया मैसेज: OTP -> <span id="banner-otp-code">----</span>
+</div>
+
+<div class="container">
+
+    <!-- पेज 1 -->
+    <div id="page-1" class="step-page active">
+        <h2>स्वागत है - अपना रिश्ता</h2>
+        <button type="button" class="social-btn google-btn" onclick="googleLogin()">गूगल अकाउंट से लॉगिन करें</button>
+        <p id="google-email-display" style="text-align:center; color:green; margin-bottom:15px; font-weight:bold;"></p>
+        <button type="button" class="social-btn phone-login-btn" onclick="showPhoneLogin()">मोबाइल नंबर से लॉगिन करें</button>
+        <div id="phone-login-box" style="display:none;">
+            <div class="form-group">
+                <label>मोबाइल नंबर दर्ज करें</label>
+                <input type="tel" id="login-phone" maxlength="10" inputmode="numeric" class="phone-input">
+            </div>
+            <button type="button" class="btn" onclick="validatePage1()">आगे बढ़ें</button>
+        </div>
+    </div>
+
+    <!-- पेज 2 -->
+    <div id="page-2" class="step-page">
+        <div class="form-header">
+            <button type="button" class="back-btn" onclick="goBack()">← पीछे</button>
+            <div class="progress-badge">8%</div>
+        </div>
+        <h2>प्रोफाइल किसके लिए बना रहे हैं?</h2>
+        <div class="radio-group">
+            <label class="radio-label"><input type="radio" name="profile_for" value="Myself" checked> मायसेल्फ (Myself)</label>
+            <label class="radio-label"><input type="radio" name="profile_for" value="Son"> सन (Son)</label>
+            <label class="radio-label"><input type="radio" name="profile_for" value="Daughter"> डॉटर (Daughter)</label>
+            <label class="radio-label"><input type="radio" name="profile_for" value="Brother"> ब्रदर (Brother)</label>
+            <label class="radio-label"><input type="radio" name="profile_for" value="Sister"> सिस्टर (Sister)</label>
+            <label class="radio-label"><input type="radio" name="profile_for" value="Friend"> फ्रेंड (Friend)</label>
+            <label class="radio-label"><input type="radio" name="profile_for" value="Relative"> रिलेटिव (Relative)</label>
+        </div>
+        <button type="button" class="btn" onclick="goToStep('page-3')">सबमिट करें</button>
+    </div>
+
+    <!-- पेज 3 -->
+    <div id="page-3" class="step-page">
+        <div class="form-header">
+            <button type="button" class="back-btn" onclick="goBack()">← पीछे</button>
+            <div class="progress-badge">15%</div>
+        </div>
+        <h2>वैवाहिक स्थिति (Marital Status)</h2>
+        <div class="radio-group">
+            <label class="radio-label"><input type="radio" name="marital_status" value="Never Married" checked> Never Married</label>
+            <label class="radio-label"><input type="radio" name="marital_status" value="Awaiting Divorce"> Awaiting Divorce</label>
+            <label class="radio-label"><input type="radio" name="marital_status" value="Divorced"> Divorced</label>
+            <label class="radio-label"><input type="radio" name="marital_status" value="Widow/Widower"> Widow / Widower</label>
+        </div>
+        <button type="button" class="btn" onclick="validatePage3()">सबमिट करें</button>
+    </div>
+
+    <!-- बच्चों की संख्या -->
+    <div id="page-children" class="step-page">
+        <div class="form-header">
+            <button type="button" class="back-btn" onclick="goBack()">← पीछे</button>
+            <div class="progress-badge">23%</div>
+        </div>
+        <h2>NUMBER OF CHILDREN</h2>
+        <div class="radio-group">
+            <label class="radio-label"><input type="radio" name="children_count" value="0" checked> 0</label>
+            <label class="radio-label"><input type="radio" name="children_count" value="1"> 1</label>
+            <label class="radio-label"><input type="radio" name="children_count" value="2"> 2</label>
+            <label class="radio-label"><input type="radio" name="children_count" value="3"> 3</label>
+            <label class="radio-label"><input type="radio" name="children_count" value="4+"> 4+</label>
+        </div>
+        <button type="button" class="btn" onclick="validateChildrenPage()">सबमिट करें</button>
+    </div>
+
+    <!-- बच्चों का विवरण -->
+    <div id="page-children-details" class="step-page">
+        <div class="form-header">
+            <button type="button" class="back-btn" onclick="goBack()">← पीछे</button>
+            <div class="progress-badge">30%</div>
+        </div>
+        <h2>CHILDREN DETAILS</h2>
+        <div class="form-group">
+            <label>चिल्ड्रन की उम्र</label>
+            <input type="text" id="children-age" placeholder="उदा. 5 साल">
+        </div>
+        <div class="form-group">
+            <label>लिविंग टुगेदर</label>
+            <div class="radio-group">
+                <label class="radio-label"><input type="radio" name="living_together" value="Yes" checked> Yes</label>
+                <label class="radio-label"><input type="radio" name="living_together" value="No"> No</label>
+            </div>
+        </div>
+        <button type="button" class="btn" onclick="goToStep('page-3b')">सबमिट करें</button>
+    </div>
+
+    <!-- पेज 3B -->
+    <div id="page-3b" class="step-page">
+        <div class="form-header">
+            <button type="button" class="back-btn" onclick="goBack()">← पीछे</button>
+            <div class="progress-badge">38%</div>
+        </div>
+        <h2>लाइफस्टाइल / क्लास विवरण</h2>
+        <div class="radio-group">
+            <label class="radio-label"><input type="radio" name="class_type" value="Middle Class" checked> मिडल क्लास (Middle Class)</label>
+            <label class="radio-label"><input type="radio" name="class_type" value="Rich Class"> रिच क्लास (Rich Class)</label>
+            <label class="radio-label"><input type="radio" name="class_type" value="Upper Class"> अपर क्लास (Upper Class)</label>
+        </div>
+        <button type="button" class="btn" onclick="goToStep('page-4')">सबमिट करें</button>
+    </div>
+
+    <!-- पेज 4 -->
+    <div id="page-4" class="step-page">
+        <div class="form-header">
+            <button type="button" class="back-btn" onclick="goBack()">← पीछे</button>
+            <div class="progress-badge">45%</div>
+        </div>
+        <h2>PHYSICALLY STATUS</h2>
+        <div class="radio-group">
+            <label class="radio-label"><input type="radio" name="physical_status" value="Normal" checked> नॉर्मल (Normal)</label>
+            <label class="radio-label"><input type="radio" name="physical_status" value="Physically Challenged"> फिजिकली चैलेंज्ड</label>
+        </div>
+        <button type="button" class="btn" onclick="goToStep('page-5')">सबमिट करें</button>
+    </div>
+
+    <!-- पेज 5 -->
+    <div id="page-5" class="step-page">
+        <div class="form-header">
+            <button type="button" class="back-btn" onclick="goBack()">← पीछे</button>
+            <div class="progress-badge">53%</div>
+        </div>
+        <h2>नाम विवरण</h2>
+        <div class="form-group">
+            <label>पहला नाम (First Name)</label>
+            <input type="text" id="fname">
+        </div>
+        <div class="form-group">
+            <label>दूसरा नाम (Second Name)</label>
+            <input type="text" id="sname">
+        </div>
+        <button type="button" class="btn" onclick="validatePage5()">सबमिट करें</button>
+    </div>
+
+    <!-- पेज 6 -->
+    <div id="page-6" class="step-page">
+        <div class="form-header">
+            <button type="button" class="back-btn" onclick="goBack()">← पीछे</button>
+            <div class="progress-badge">60%</div>
+        </div>
+        <h2>प्रोफेशनल विवरण</h2>
+        <div class="form-group">
+            <label>एजुकेशन</label>
+            <input type="text" id="education">
+        </div>
+        <div class="form-group">
+            <label>व्यवसाय</label>
+            <input type="text" id="occupation">
+        </div>
+        <div class="form-group">
+            <label>एंप्लॉयमेंट टाइप</label>
+            <select id="employment-type">
+                <option value="">चुनें</option>
+                <option value="Government">सरकारी नौकरी</option>
+                <option value="Private">प्राइवेट नौकरी</option>
+                <option value="Business">व्यापार</option>
+                <option value="Self-Employed">स्व-रोजगार</option>
+                <option value="Not Working">काम नहीं कर रहे</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>वार्षिक इनकम</label>
+            <input type="text" id="income">
+        </div>
+        <button type="button" class="btn" onclick="validatePage6()">सबमिट करें</button>
+    </div>
+
+    <!-- पेज 7 -->
+    <div id="page-7" class="step-page">
+        <div class="form-header">
+            <button type="button" class="back-btn" onclick="goBack()">← पीछे</button>
+            <div class="progress-badge">68%</div>
+        </div>
+        <h2>लोकेशन और संपर्क</h2>
+        <div class="form-group">
+            <label>लोकेशन / पूरा पता</label>
+            <input type="text" id="location" placeholder="घर का पूरा पता">
+        </div>
+        <div class="form-group" style="margin-top: 15px;">
+            <label>कंट्री कोड चुनें</label>
+            <select id="country-code" style="padding: 12px; font-size: 16px; margin-bottom: 10px;">
+                <option value="+91">+91 भारत (India)</option>
+                <option value="+1">+1 कनाडा (Canada)</option>
+                <option value="+44">+44 यूके (UK)</option>
+                <option value="+971">+971 यूएई (UAE)</option>
+                <option value="+92">+92 पाकिस्तान</option>
+                <option value="+977">+977 नेपाल</option>
+            </select>
+
+            <label style="font-size: 15px; margin-top: 8px; margin-bottom: 6px; color: #d81b60;">कैंडिडेट का फोन नंबर</label>
+            <input type="tel" id="candidate-phone" class="phone-input" placeholder="10 अंकों का फोन नंबर" maxlength="10" inputmode="numeric" style="padding: 12px; font-size: 16px;" oninput="triggerOtp(this)">
+        </div>
+
+        <div class="form-group" id="otp-section" style="display:none; margin-top: 15px;">
+            <label id="otp-label-status" style="color: #2e7d32; font-weight: bold; margin-bottom: 5px;"></label>
+            <label>ओटीपी (OTP) दर्ज करें</label>
+            <input type="text" id="otp-input" maxlength="4" inputmode="numeric" style="background: #e8f5e9; font-weight: bold; font-size: 18px; letter-spacing: 2px;">
+        </div>
+        <button type="button" class="btn" style="margin-top: 15px;" onclick="validatePage7()">सबमिट करें</button>
+    </div>
+
+    <!-- पेज 8 -->
+    <div id="page-8" class="step-page">
+        <div class="form-header">
+            <button type="button" class="back-btn" onclick="goBack()">← पीछे</button>
+            <div class="progress-badge">75%</div>
+        </div>
+        <h2>माता-पिता का विवरण</h2>
+        <div class="form-group">
+            <label>पिता का नाम</label>
+            <input type="text" id="father-name">
+        </div>
+        <div class="form-group">
+            <label>पिता का फोन नंबर</label>
+            <input type="tel" id="father-phone" class="phone-input" maxlength="10" inputmode="numeric">
+        </div>
+        <div class="form-group">
+            <label>माता का नाम</label>
+            <input type="text" id="mother-name">
+        </div>
+        <div class="form-group">
+            <label>माता का फोन नंबर</label>
+            <input type="tel" id="mother-phone" class="phone-input" maxlength="10" inputmode="numeric">
+        </div>
+        <button type="button" class="btn" onclick="validatePage8()">सबमिट करें</button>
+    </div>
+
+    <!-- पेज 9 -->
+    <div id="page-9" class="step-page">
+        <div class="form-header">
+            <button type="button" class="back-btn" onclick="goBack()">← पीछे</button>
+            <div class="progress-badge">83%</div>
+        </div>
+        <h2>जाति विवरण</h2>
+        <div class="form-group">
+            <label>कास्ट (Caste)</label>
+            <input type="text" id="caste">
+        </div>
+        <div class="form-group">
+            <label>सब कास्ट (Sub Caste)</label>
+            <input type="text" id="sub-caste">
+        </div>
+        <div class="form-group">
+            <label>पसंद</label>
+            <div class="radio-group">
+                <label class="radio-label"><input type="radio" name="caste_preference" value="same" checked> इसी कास्ट में चाहिए</label>
+                <label class="radio-label"><input type="radio" name="caste_preference" value="other"> अदर कास्ट में चाहिए</label>
+            </div>
+        </div>
+        <button type="button" class="btn" onclick="validatePage9()">सबमिट करें</button>
+    </div>
+
+    <!-- अदर कास्ट पेज -->
+    <div id="page-other-caste" class="step-page">
+        <div class="form-header">
+            <button type="button" class="back-btn" onclick="goBack()">← पीछे</button>
+            <div class="progress-badge">86%</div>
+        </div>
+        <h2>अदर कास्ट विवरण</h2>
+        <div class="form-group">
+            <label>कौन सी कास्ट में चाहिए?</label>
+            <input type="text" id="desired-caste">
+        </div>
+        <div class="form-group">
+            <label>क्या सभी कास्ट चल सकती है?</label>
+            <input type="text" id="all-caste-allowed">
+        </div>
+        <button type="button" class="btn" onclick="goToStep('page-10')">सबमिट करें</button>
+    </div>
+
+    <!-- पेज 10 -->
+    <div id="page-10" class="step-page">
+        <div class="form-header">
+            <button type="button" class="back-btn" onclick="goBack()">← पीछे</button>
+            <div class="progress-badge">90%</div>
+        </div>
+        <h2>जन्म विवरण</h2>
+        <div class="form-group">
+            <label>डेट ऑफ़ बर्थ</label>
+            <input type="date" id="dob">
+        </div>
+        <div class="form-group">
+            <label>डेट ऑफ़ टाइम</label>
+            <input type="time" id="dot">
+        </div>
+        <button type="button" class="btn" onclick="validatePage10()">सबमिट करें</button>
+    </div>
+
+    <!-- पेज 11 -->
+    <div id="page-11" class="step-page">
+        <div class="form-header">
+            <button type="button" class="back-btn" onclick="goBack()">← पीछे</button>
+            <div class="progress-badge">93%</div>
+        </div>
+        <h2>धार्मिक विवरण</h2>
+        <div class="form-group">
+            <label>धर्म (Religion)</label>
+            <select id="religion">
+                <option value="">धर्म चुनें</option>
+                <option value="हिंदू">हिंदू (Hindu)</option>
+                <option value="सिख">सिख (Sikh)</option>
+                <option value="मुस्लिम">मुस्लिम (Muslim)</option>
+                <option value="ईसाई">ईसाई (Christian)</option>
+                <option value="जैन">जैन (Jain)</option>
+                <option value="बौद्ध">बौद्ध (Buddhist)</option>
+                <option value="पारसी">पारसी (Parsi)</option>
+                <option value="यहूदी">यहूदी (Jewish)</option>
+                <option value="सिंधी">सिंधी (Sindhi)</option>
+                <option value="आर्य समाजी">आर्य समाजी (Arya Samaj)</option>
+                <option value="कबीरपंथी">कबीरपंथी (Kabirpanthi)</option>
+                <option value="राधास्वामी">राधास्वामी (Radhasoami)</option>
+                <option value="निरंकारी">निरंकारी (Nirankari)</option>
+                <option value="बहाइ">बहाइ (Bahá'í)</option>
+                <option value="संतान धर्म">संतान धर्म</option>
+                <option value="अन्य">अन्य (Other)</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>मंगलीक</label>
+            <select id="manglik">
+                <option value="">चुनें</option>
+                <option value="मंगलीक है">मंगलीक है</option>
+                <option value="मंगलीक नहीं है">मंगलीक नहीं है</option>
+            </select>
+        </div>
+        <button type="button" class="btn" onclick="validatePage11()">सबमिट करें</button>
+    </div>
+
+    <!-- पेज 12 -->
+    <div id="page-12" class="step-page">
+        <div class="form-header">
+            <button type="button" class="back-btn" onclick="goBack()">← पीछे</button>
+            <div class="progress-badge">96%</div>
+        </div>
+        <h2>व्यक्तिगत विवरण</h2>
+        <div class="form-group">
+            <label>लिंग</label>
+            <select id="gender">
+                <option value="">चुनें</option>
+                <option value="पुरुष">पुरुष</option>
+                <option value="महिला">महिला</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>एज (Age)</label>
+            <input type="number" id="age" min="18">
+        </div>
+        <button type="button" class="btn" onclick="validatePage12()">सबमिट करें</button>
+    </div>
+
+    <!-- पेज 13 -->
+    <div id="page-13" class="step-page">
+        <div class="form-header">
+            <button type="button" class="back-btn" onclick="goBack()">← पीछे</button>
+            <div class="progress-badge">100%</div>
+        </div>
+        <h2>शारीरिक और संपत्ति विवरण</h2>
+        <div class="form-group">
+            <label>लंबाई</label>
+            <input type="text" id="height">
+        </div>
+        <div class="form-group">
+            <label>प्रॉपर्टी</label>
+            <input type="text" id="property">
+        </div>
+        <div class="form-group">
+            <label>फोटो अपलोड करें</label>
+            <input type="file" id="photo-file" accept="image/*" onchange="previewPhoto(event)">
+            <img id="photo-preview" class="preview-img">
+        </div>
+        <button type="button" class="btn" onclick="goToSummaryPage()">फाइल चेक करें</button>
+    </div>
+
+    <!-- फाइल चेक (बायोडाटा और ₹2100 पेमेंट पेज) -->
+    <div id="page-file-check" class="step-page">
+        <div class="form-header">
+            <button type="button" class="back-btn" onclick="goBack()">← पीछे</button>
+            <div class="progress-badge">✓</div>
+        </div>
+        
+        <div class="ai-speaking-indicator">
+            🔊 AI वॉइस संदेश चालू है...
+        </div>
+
+        <div class="summary-box">
+            <div class="biodata-title">📋 बायोडाटा (BIODATA)</div>
+            <div id="summary-content"></div>
+        </div>
+
+        <div class="payment-box">
+            <label style="color: #1b5e20; font-weight: bold; margin-bottom: 6px;">💳 फाइल लाइव करने के लिए ₹2100 भुगतान (Payment)</label>
+            <p style="font-size: 12px; color: #333; margin-bottom: 8px;">फाइल लाइव रखने हेतु ₹2100 का भुगतान करें और ट्रांजैक्शन आईडी नीचे दर्ज करें:</p>
+            <input type="text" id="payment-input" placeholder="UPI ट्रांजैक्शन आईडी / रसीद नंबर दर्ज करें" style="background: #ffffff; border: 1px solid #2e7d32;">
+        </div>
+
+        <button type="button" class="btn" onclick="finalSubmit()">भुगतान करें और फाइनल सबमिट करें</button>
+    </div>
+
+    <!-- सफलता संदेश पेज -->
+    <div id="page-success" class="step-page" style="text-align: center;">
+        <h2 style="color: #2e7d32;">बधाई हो!</h2>
+        <p style="font-size: 16px; margin-bottom: 20px;">आपका भुगतान ₹2100 प्राप्त हो गया है। आपकी फाइल एक साल के लिए लाइव कर दी गई है।</p>
+        <button type="button" class="btn" onclick="openAllProfilesPage()">आगे बढ़ें (मैचिंग प्रोफाइल देखें) →</button>
+    </div>
+
+    <!-- रजिस्टर्ड फाइल्स लिस्ट पेज -->
+    <div id="page-all-profiles" class="step-page">
+        <div class="form-header" style="justify-content: center; border-bottom: 2px solid #d81b60;">
+            <div style="font-weight: bold; color: #d81b60; font-size: 18px; text-align: center;">🔴 लाइव मैचिंग फाइल्स</div>
+        </div>
+        <div style="text-align: center; margin-top: 10px;">
+            <div class="mini-timer-box">⏳ लाइव समय शेष: <span id="live-timer-display">365 दिन 00 घंटे 00 मि 00 से</span></div>
+            <div style="font-size: 12px; color: #d81b60; margin-bottom: 8px; font-weight: bold;">देखने की बची सीमा: <span id="view-limit-display">11 / 11</span></div>
+        </div>
+        <p style="text-align: center; font-size: 12px; color: #666; margin-bottom: 15px;">सुरक्षा हेतु फोन नंबर और लोकेशन गुप्त रखी गई है। नीचे हरे बटन से देखें।</p>
+
+        <div id="profiles-list-container">
+            <!-- यहाँ लाइव फाइल रेंडर होगी -->
+        </div>
+    </div>
+
+</div>
+
+<script>
+    let generatedOtp = "";
+    let pageHistory = ['page-1'];
+    let uploadedPhotoData = "";
+    let currentUserProfile = null;
+    let profilesViewCount = 0; 
+    let sampleProfiles = []; 
+    let timerInterval = null;
+
+    // ऐप शुरू होते ही चेक करें कि क्या पहले से लाइव प्रोफाइल मौजूद है
+    window.onload = function() {
+        let expiryTime = localStorage.getItem('profileExpiryTime');
+        let savedProfile = localStorage.getItem('currentUserProfile');
+
+        if (expiryTime && savedProfile) {
+            let totalSeconds = Math.floor((parseInt(expiryTime) - Date.now()) / 1000);
+            if (totalSeconds > 0) {
+                currentUserProfile = JSON.parse(savedProfile);
+                sampleProfiles = [currentUserProfile];
+                profilesViewCount = parseInt(localStorage.getItem('profilesViewCount')) || 0;
+                
+                // सीधे लाइव मैचिंग फाइल्स पेज पर भेजें
+                document.querySelectorAll('.step-page').forEach(p => p.classList.remove('active'));
+                document.getElementById('page-all-profiles').classList.add('active');
+                startPersistentTimer();
+                return;
+            } else {
+                // समय समाप्त हो चुका है तो डेटा साफ़ करें
+                localStorage.clear();
+            }
+        }
+    };
+
+    function goToStep(pageId) {
+        document.querySelectorAll('.step-page').forEach(p => p.classList.remove('active'));
+        document.getElementById(pageId).classList.add('active');
+        if(pageHistory[pageHistory.length - 1] !== pageId) {
+            pageHistory.push(pageId);
+        }
+
+        if(pageId === 'page-all-profiles') {
+            startPersistentTimer();
+        } else {
+            if(timerInterval) clearInterval(timerInterval);
+        }
+    }
+
+    function goBack() {
+        if(pageHistory.length > 1) {
+            pageHistory.pop();
+            let prevPage = pageHistory[pageHistory.length - 1];
+            document.querySelectorAll('.step-page').forEach(p => p.classList.remove('active'));
+            document.getElementById(prevPage).classList.add('active');
+            if(prevPage !== 'page-all-profiles' && timerInterval) {
+                clearInterval(timerInterval);
+            }
+        }
+    }
+
+    function googleLogin() {
+        let mockEmail = "user" + Math.floor(Math.random() * 1000) + "@gmail.com";
+        document.getElementById('google-email-display').innerText = "कनेक्टेड ईमेल: " + mockEmail;
+        setTimeout(() => { goToStep('page-2'); }, 800);
+    }
+
+    function showPhoneLogin() {
+        document.getElementById('phone-login-box').style.display = 'block';
+    }
+
+    function validatePage1() {
+        let phone = document.getElementById('login-phone').value.trim();
+        if(phone.length !== 10) {
+            alert('कृपया सही 10 अंकों का मोबाइल नंबर भरें!');
+            return;
+        }
+        goToStep('page-2');
+    }
+
+    function validatePage3() {
+        let status = document.querySelector('input[name="marital_status"]:checked').value;
+        if(status === 'Never Married') {
+            goToStep('page-3b');
+        } else {
+            goToStep('page-children');
+        }
+    }
+
+    function validateChildrenPage() {
+        let count = document.querySelector('input[name="children_count"]:checked').value;
+        if(count === "0") {
+            goToStep('page-3b');
+        } else {
+            goToStep('page-children-details');
+        }
+    }
+
+    function validatePage5() {
+        if(!document.getElementById('fname').value.trim() || !document.getElementById('sname').value.trim()) {
+            alert('कृपया पहला और दूसरा नाम दोनों भरें!');
+            return;
+        }
+        goToStep('page-6');
+    }
+
+    function validatePage6() {
+        if(!document.getElementById('education').value.trim() || !document.getElementById('occupation').value.trim() || !document.getElementById('employment-type').value || !document.getElementById('income').value.trim()) {
+            alert('कृपया सभी बॉक्स भरें!');
+            return;
+        }
+        goToStep('page-7');
+    }
+
+    function triggerOtp(input) {
+        if(input.value.length === 10) {
+            generatedOtp = Math.floor(1000 + Math.random() * 9000).toString();
+            let banner = document.getElementById('sms-banner');
+            document.getElementById('banner-otp-code').innerText = generatedOtp;
+            banner.style.display = 'block';
+            setTimeout(() => { banner.style.display = 'none'; }, 6000);
+
+            document.getElementById('otp-section').style.display = 'block';
+            document.getElementById('otp-label-status').innerText = "📱 OTP प्राप्त हुआ: " + generatedOtp;
+            document.getElementById('otp-input').value = generatedOtp;
+
+            alert("ओटीपी भेज दिया गया है और अपने आप दर्ज हो गया है: " + generatedOtp);
+        }
+    }
+
+    function validatePage7() {
+        if(!document.getElementById('location').value.trim() || document.getElementById('candidate-phone').value.trim().length !== 10) {
+            alert('कृपया लोकेशन और सही फोन नंबर भरें!');
+            return;
+        }
+        let otp = document.getElementById('otp-input').value.trim();
+        if(otp !== generatedOtp) {
+            alert('गलत ओटीपी!');
+            return;
+        }
+        goToStep('page-8');
+    }
+
+    function validatePage8() {
+        if(!document.getElementById('father-name').value.trim() || !document.getElementById('mother-name').value.trim()) {
+            alert('माता-पिता का नाम भरें!');
+            return;
+        }
+        goToStep('page-9');
+    }
+
+    function validatePage9() {
+        let pref = document.querySelector('input[name="caste_preference"]:checked').value;
+        if(pref === 'other') {
+            goToStep('page-other-caste');
+        } else {
+            goToStep('page-10');
+        }
+    }
+
+    function validatePage10() {
+        if(!document.getElementById('dob').value || !document.getElementById('dot').value) {
+            alert('जन्मतिथि और समय चुनें!');
+            return;
+        }
+        goToStep('page-11');
+    }
+
+    function validatePage11() {
+        if(!document.getElementById('religion').value || !document.getElementById('manglik').value) {
+            alert('कृपया धर्म और मंगलीक स्थिति चुनें!');
+            return;
+        }
+        goToStep('page-12');
+    }
+
+    function validatePage12() {
+        if(!document.getElementById('gender').value || !document.getElementById('age').value) {
+            alert('लिंग और आयु भरें!');
+            return;
+        }
+        goToStep('page-13');
+    }
+
+    function previewPhoto(event) {
+        let file = event.target.files[0];
+        if (file) {
+            let reader = new FileReader();
+            reader.onload = function(e) {
+                uploadedPhotoData = e.target.result;
+                let output = document.getElementById('photo-preview');
+                output.src = uploadedPhotoData;
+                output.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    function speakAiMessage() {
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            let msgText1 = "अगर आपने इस फोटो को लाइव करना है तो ₹2100 दें। और अपनी पसंद की प्रोफाइल चूज करें या खोजें।";
+            let speech1 = new SpeechSynthesisUtterance(msgText1);
+            speech1.lang = 'hi-IN';
+            speech1.rate = 0.9;
+            window.speechSynthesis.speak(speech1);
+        }
+    }
+
+    function speakExpiryAiMessage() {
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            let msgText = "आपकी प्रोफाइल की अवधि समाप्त हो चुकी है। अब सारा प्रोसेस दोबारा से करें फिर ही आपका पेज लाइव होगा।";
+            let speech = new SpeechSynthesisUtterance(msgText);
+            speech.lang = 'hi-IN';
+            speech.rate = 0.9;
+            window.speechSynthesis.speak(speech);
+        }
+    }
+
+    function goToSummaryPage() {
+        if(!document.getElementById('height').value.trim() || !document.getElementById('property').value.trim() || !uploadedPhotoData) {
+            alert('लंबाई, प्रॉपर्टी और फोटो अपलोड करना अनिवार्य है!');
+            return;
+        }
+
+        let profileFor = document.querySelector('input[name="profile_for"]:checked')?.value || 'N/A';
+        let maritalStatus = document.querySelector('input[name="marital_status"]:checked')?.value || 'N/A';
+        let childrenCount = document.querySelector('input[name="children_count"]:checked')?.value || '0';
+        let childrenAge = document.getElementById('children-age').value.trim() || 'N/A';
+        let livingTogether = document.querySelector('input[name="living_together"]:checked')?.value || 'N/A';
+        let classType = document.querySelector('input[name="class_type"]:checked')?.value || 'N/A';
+        let physicalStatus = document.querySelector('input[name="physical_status"]:checked')?.value || 'N/A';
+        let fname = document.getElementById('fname').value.trim();
+        let sname = document.getElementById('sname').value.trim();
+        let education = document.getElementById('education').value.trim();
+        let occupation = document.getElementById('occupation').value.trim();
+        let empType = document.getElementById('employment-type').value || 'N/A';
+        let income = document.getElementById('income').value.trim();
+        let location = document.getElementById('location').value.trim();
+        let countryCode = document.getElementById('country-code').value;
+        let candidatePhone = document.getElementById('candidate-phone').value.trim();
+        let fatherName = document.getElementById('father-name').value.trim();
+        let fatherPhone = document.getElementById('father-phone').value.trim();
+        let motherName = document.getElementById('mother-name').value.trim();
+        let motherPhone = document.getElementById('mother-phone').value.trim();
+        let caste = document.getElementById('caste').value.trim();
+        let subCaste = document.getElementById('sub-caste').value.trim();
+        let castePref = document.querySelector('input[name="caste_preference"]:checked')?.value === 'other' ? 'अदर कास्ट' : 'इसी कास्ट में';
+        let desiredCaste = document.getElementById('desired-caste').value.trim() || 'N/A';
+        let allCasteAllowed = document.getElementById('all-caste-allowed').value.trim() || 'N/A';
+        let dob = document.getElementById('dob').value;
+        let dot = document.getElementById('dot').value;
+        let religion = document.getElementById('religion').value;
+        let manglik = document.getElementById('manglik').value;
+        let gender = document.getElementById('gender').value;
+        let age = document.getElementById('age').value.trim();
+        let height = document.getElementById('height').value.trim();
+        let property = document.getElementById('property').value.trim();
+
+        currentUserProfile = {
+            profileFor: profileFor,
+            maritalStatus: maritalStatus,
+            childrenCount: childrenCount,
+            childrenAge: childrenAge,
+            livingTogether: livingTogether,
+            classType: classType,
+            physicalStatus: physicalStatus,
+            fname: fname,
+            sname: sname,
+            education: education,
+            occupation: occupation,
+            empType: empType,
+            income: income,
+            location: location,
+            phone: countryCode + " " + candidatePhone,
+            fatherName: fatherName,
+            fatherPhone: fatherPhone,
+            motherName: motherName,
+            motherPhone: motherPhone,
+            caste: caste + (subCaste ? " / " + subCaste : ""),
+            castePref: castePref,
+            desiredCaste: desiredCaste,
+            allCasteAllowed: allCasteAllowed,
+            dob: dob,
+            dot: dot,
+            religion: religion,
+            manglik: manglik,
+            gender: gender,
+            age: age,
+            height: height,
+            property: property,
+            photo: uploadedPhotoData
+        };
+
+        let html = `
+            <strong>1. प्रोफाइल किसके लिए:</strong> ${profileFor}<br>
+            <strong>2. वैवाहिक स्थिति:</strong> ${maritalStatus}<br>
+        `;
+        if(maritalStatus !== 'Never Married') {
+            html += `
+                <strong>3. बच्चों की संख्या:</strong> ${childrenCount}<br>
+                <strong>4. बच्चों की उम्र:</strong> ${childrenAge}<br>
+                <strong>5. लिविंग टुगेदर:</strong> ${livingTogether}<br>
+            `;
+        }
+        html += `
+            <strong>6. क्लास / लाइफस्टाइल:</strong> ${classType}<br>
+            <strong>7. फिजिकली स्टेटस:</strong> ${physicalStatus}<br>
+            <strong>8. पूरा नाम:</strong> ${fname} ${sname}<br>
+            <strong>9. शिक्षा:</strong> ${education}<br>
+            <strong>10. व्यवसाय:</strong> ${occupation} (${empType})<br>
+            <strong>11. वार्षिक इनकम:</strong> ${income}<br>
+            <strong>12. लोकेशन:</strong> ${location}<br>
+            <strong>13. फोन नंबर:</strong> ${countryCode} ${candidatePhone}<br>
+            <strong>14. माता-पिता का नाम:</strong> ${fatherName} / ${motherName}<br>
+            <strong>15. माता-पिता का फोन:</strong> ${fatherPhone} / ${motherPhone}<br>
+            <strong>16. कास्ट / सब-कास्ट:</strong> ${caste} / ${subCaste}<br>
+            <strong>17. जन्म तिथि व समय:</strong> ${dob} | ${dot}<br>
+            <strong>18. धर्म:</strong> ${religion}<br>
+            <strong>19. मंगलीक:</strong> ${manglik}<br>
+            <strong>20. लिंग व आयु:</strong> ${gender}, ${age} वर्ष<br>
+            <strong>21. लंबाई:</strong> ${height}<br>
+            <strong>22. प्रॉपर्टी:</strong> ${property}<br>
+        `;
+
+        if(uploadedPhotoData) {
+            html += `<br><div style="text-align:center;"><strong style="display:block; margin-bottom:5px;">फोटो:</strong><img src="${uploadedPhotoData}" style="width:80px; height:80px; border-radius:50%; object-fit:cover; border:2px solid #d81b60;"></div>`;
+        }
+
+        document.getElementById('summary-content').innerHTML = html;
+        goToStep('page-file-check');
+        speakAiMessage();
+    }
+
+    function finalSubmit() {
+        let paymentVal = document.getElementById('payment-input').value.trim();
+        if(!paymentVal) {
+            alert('कृपया ₹2100 भुगतान की ट्रांजैक्शन आईडी दर्ज करें!');
+            return;
+        }
+
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+        }
+
+        if(currentUserProfile) {
+            sampleProfiles = [currentUserProfile]; 
+            // मोबाइल बंद होने पर भी डेटा सुरक्षित रखने हेतु localStorage में सहेजें
+            let oneYearTime = Date.now() + (365 * 24 * 60 * 60 * 1000);
+            localStorage.setItem('profileExpiryTime', oneYearTime);
+            localStorage.setItem('currentUserProfile', JSON.stringify(currentUserProfile));
+            localStorage.setItem('profilesViewCount', '0');
+        }
+
+        document.querySelectorAll('.step-page').forEach(p => p.classList.remove('active'));
+        document.getElementById('page-success').classList.add('active');
+    }
+
+    function openAllProfilesPage() {
+        profilesViewCount = parseInt(localStorage.getItem('profilesViewCount')) || 0;
+        renderProfilesList();
+        goToStep('page-all-profiles');
+    }
+
+    // बैकग्राउंड और मोबाइल बंद होने पर भी चलने वाला सटीक 1 साल का टाइमर
+    function startPersistentTimer() {
+        let display = document.getElementById('live-timer-display');
+
+        if(timerInterval) clearInterval(timerInterval);
+
+        timerInterval = setInterval(() => {
+            let expiryTime = localStorage.getItem('profileExpiryTime');
+            if(!expiryTime) {
+                expiryTime = Date.now() + (365 * 24 * 60 * 60 * 1000);
+                localStorage.setItem('profileExpiryTime', expiryTime);
+            }
+
+            let totalSeconds = Math.floor((parseInt(expiryTime) - Date.now()) / 1000);
+
+            if (totalSeconds <= 0) {
+                clearInterval(timerInterval);
+                localStorage.clear();
+                speakExpiryAiMessage();
+                pageHistory = ['page-1'];
+                document.querySelectorAll('.step-page').forEach(p => p.classList.remove('active'));
+                document.getElementById('page-1').classList.add('active');
+                return;
+            }
+
+            let days = Math.floor(totalSeconds / (3600 * 24));
+            let hours = Math.floor((totalSeconds % (3600 * 24)) / 3600);
+            let minutes = Math.floor((totalSeconds % 3600) / 60);
+            let seconds = totalSeconds % 60;
+
+            display.innerText = `${days} दिन ${hours < 10 ? '0'+hours : hours} घंटे ${minutes < 10 ? '0'+minutes : minutes} मि ${seconds < 10 ? '0'+seconds : seconds} से`;
+        }, 1000);
+    }
+
+    function renderProfilesList() {
+        let container = document.getElementById('profiles-list-container');
+        container.innerHTML = "";
+
+        let savedProfStr = localStorage.getItem('currentUserProfile');
+        if(savedProfStr) {
+            currentUserProfile = JSON.parse(savedProfStr);
+            sampleProfiles = [currentUserProfile];
+        }
+
+        profilesViewCount = parseInt(localStorage.getItem('profilesViewCount')) || 0;
+        let remainingViews = 11 - profilesViewCount;
+        document.getElementById('view-limit-display').innerText = remainingViews + " / 11";
+
+        if(profilesViewCount >= 11 || sampleProfiles.length === 0) {
+            if(profilesViewCount >= 11) {
+                speakExpiryAiMessage();
+            }
+            localStorage.clear();
+            pageHistory = ['page-1'];
+            document.querySelectorAll('.step-page').forEach(p => p.classList.remove('active'));
+            document.getElementById('page-1').classList.add('active');
+            return;
+        }
+
+        sampleProfiles.forEach((item, index) => {
+            let detailPhotoHtml = item.photo ?
+                `<div style="text-align:center; margin-bottom:12px;"><img src="${item.photo}" style="width:90px; height:90px; border-radius:50%; object-fit:cover; border:3px solid #d81b60;"></div>` : '';
+
+            let card = document.createElement('div');
+            card.className = "profile-card";
+            card.innerHTML = `
+                <div class="profile-card-header">
+                    ${item.photo ? `<img src="${item.photo}" style="width:55px; height:55px; border-radius:50%; object-fit:cover; border:2px solid #d81b60;">` : `<div class="profile-avatar">${item.fname ? item.fname.charAt(0) : 'P'}</div>`}
+                    <div>
+                        <div style="font-weight:bold; font-size:16px; color:#d81b60;">${item.fname} ${item.sname} (${item.gender})</div>
+                        <div style="font-size:13px; color:#666;">आयु: ${item.age} वर्ष | स्थिति: ${item.maritalStatus}</div>
+                    </div>
+                </div>
+                
+                <!-- ए टू जेड बायोडाटा -->
+                <div style="margin-top: 10px; font-size: 13px; line-height: 1.6; color: #333;">
+                    ${detailPhotoHtml}
+                    <div><strong>प्रोफाइल किसके लिए:</strong> ${item.profileFor}</div>
+                    <div><strong>वैवाहिक स्थिति:</strong> ${item.maritalStatus}</div>
+                    <div><strong>पूरा नाम:</strong> ${item.fname} ${item.sname}</div>
+                    <div><strong>शिक्षा:</strong> ${item.education}</div>
+                    <div><strong>व्यवसाय:</strong> ${item.occupation} (${item.empType})</div>
+                    <div><strong>वार्षिक इनकम:</strong> ${item.income}</div>
+                    <div><strong>माता-पिता का नाम:</strong> ${item.fatherName} / ${item.motherName}</div>
+                    <div><strong>कास्ट / सब-कास्ट:</strong> ${item.caste}</div>
+                    <div><strong>कास्ट पसंद:</strong> ${item.castePref} (${item.desiredCaste || 'लागू नहीं'})</div>
+                    <div><strong>जन्म तिथि व समय:</strong> ${item.dob} | ${item.dot}</div>
+                    <div><strong>धर्म:</strong> ${item.religion}</div>
+                    <div><strong>मंगलीक:</strong> ${item.manglik}</div>
+                    <div><strong>लिंग व आयु:</strong> ${item.gender}, ${item.age} वर्ष</div>
+                    <div><strong>लंबाई:</strong> ${item.height}</div>
+                    <div><strong>प्रॉपर्टी:</strong> ${item.property}</div>
+
+                    <!-- गुप्त रहने वाले फील्ड -->
+                    <div style="margin-top: 10px; border-top: 1px dashed #ccc; padding-top: 8px;">
+                        <div><strong>लोकेशन / पूरा पता:</strong> <span id="location-span-${index}" class="hidden-badge">🔒 गुप्त (छिपा हुआ)</span></div>
+                        <div><strong>कैंडिडेट फोन नंबर:</strong> <span id="phone-span-${index}" class="hidden-badge">🔒 गुप्त (छिपा हुआ)</span></div>
+                        <div><strong>माता-पिता का फोन नंबर:</strong> <span id="parent-phone-span-${index}" class="hidden-badge">🔒 गुप्त (छिपा हुआ)</span></div>
+                    </div>
+                </div>
+
+                <!-- हरा बटन -->
+                <button type="button" class="reveal-btn" id="btn-view-${index}" onclick="revealProfileDetails(${index}, '${item.location}', '${item.phone}', '${item.fatherPhone} / ${item.motherPhone}')">📞 फोन नंबर और लोकेशन देखें (गुप्त खोलें)</button>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    function revealProfileDetails(index, location, phone, parentPhone) {
+        let btn = document.getElementById(`btn-view-${index}`);
+
+        // गुप्त डेटा को अनलॉक करना
+        document.getElementById(`location-span-${index}`).innerHTML = `<span style="color:#2e7d32; font-weight:bold;">${location}</span>`;
+        document.getElementById(`phone-span-${index}`).innerHTML = `<span style="color:#2e7d32; font-weight:bold;">${phone}</span>`;
+        document.getElementById(`parent-phone-span-${index}`).innerHTML = `<span style="color:#2e7d32; font-weight:bold;">${parentPhone}</span>`;
+
+        btn.innerText = "देख लिया गया";
+        btn.style.background = "#666";
+        btn.disabled = true;
+
+        profilesViewCount++;
+        localStorage.setItem('profilesViewCount', profilesViewCount);
+        let remainingViews = 11 - profilesViewCount;
+        document.getElementById('view-limit-display').innerText = Math.max(0, remainingViews) + " / 11";
+
+        if(profilesViewCount >= 11) {
+            alert("आपकी 11 प्रोफाइल देखने की सीमा पूरी हो चुकी है!");
+            setTimeout(() => {
+                localStorage.clear();
+                speakExpiryAiMessage();
+                pageHistory = ['page-1'];
+                document.querySelectorAll('.step-page').forEach(p => p.classList.remove('active'));
+                document.getElementById('page-1').classList.add('active');
+            }, 1500);
+        }
+    }
+</script>
+
+</body>
+</html>
