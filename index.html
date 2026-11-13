@@ -711,7 +711,7 @@
             <div style="font-size: 12px; color: #d81b60; margin-bottom: 8px; font-weight: bold;">देखने की बची सीमा: <span id="view-limit-display">11 / 11</span></div>
         </div>
         <p style="text-align: center; font-size: 12px; color: #666; margin-bottom: 15px;">सुरक्षा हेतु फोन नंबर और लोकेशन गुप्त रखी गई है। नीचे हरे बटन से देखें।</p>
-
+<div id="profile-container"></div> 
         <div id="profiles-list-container">
             <!-- यहाँ लाइव फाइल रेंडर होगी -->
         </div>
@@ -1219,6 +1219,27 @@
         }
     }
 </script>
+// डेटाबेस से प्रोफाइल्स फेच करने का फंक्शन (उदाहरण)
+async function loadProfiles() {
+    const { data: profiles, error } = await supabase
+        .from('profiles')
+        .select('*');
+
+    if (error) console.error('Error fetching profiles:', error);
+    else renderProfileGrid(profiles);
+}
+
+// फ्रंटएंड पर प्रोफाइल्स रेंडर करने का फंक्शन
+function renderProfileGrid(profiles) {
+    const container = document.getElementById('profile-container');
+    container.innerHTML = profiles.map(profile => `
+        <div class="profile-card" onclick="viewProfile('${profile.id}')">
+            <img src="${profile.avatar_url}" alt="${profile.name}">
+            <h3>${profile.name}</h3>
+            <p>${profile.age} yrs, ${profile.occupation}</p>
+        </div>
+    `).join('');
+}
 
 </body>
 </html>
