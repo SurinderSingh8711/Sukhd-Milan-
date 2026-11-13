@@ -1232,13 +1232,7 @@ async function loadProfiles() {
 // फ्रंटएंड पर प्रोफाइल्स रेंडर करने का फंक्शन
 function renderProfileGrid(profiles) {
     const container = document.getElementById('profile-container');
-    container.innerHTML = profiles.map(profile => `
-        <div class="profile-card" onclick="viewProfile('${profile.id}')">
-            <img src="${profile.avatar_url}" alt="${profile.name}">
-            <h3>${profile.name}</h3>
-            <p>${profile.age} yrs, ${profile.occupation}</p>
-        </div>
-    `).join('');
+
 }
 <script>loadProfiles();</script>।
 </body>
