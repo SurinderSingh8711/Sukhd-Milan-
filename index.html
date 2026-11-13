@@ -1057,7 +1057,7 @@
         if(!paymentVal) {
             alert('कृपया ₹2100 भुगतान की ट्रांजैक्शन आईडी दर्ज करें!');
             return;
-        }
+        } supabase.from('Users').insert([formData])
 
         if ('speechSynthesis' in window) {
             window.speechSynthesis.cancel();
