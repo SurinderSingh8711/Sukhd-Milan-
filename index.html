@@ -1218,7 +1218,7 @@
             }, 1500);
         }
     }
-</script>
+
 // डेटाबेस से प्रोफाइल्स फेच करने का फंक्शन (उदाहरण)
 async function loadProfiles() {
     const { data: profiles, error } = await supabase
@@ -1242,5 +1242,5 @@ container.innerHTML = profiles.map(profile => `
 
 }
 <script>loadProfiles();</script>।
-</body>
+</script> </body>
 </html>
